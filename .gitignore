@@ -1,0 +1,6 @@
+weird-client
+weird-server
+*.o
+*.c
+.*.swp
+
