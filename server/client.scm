@@ -124,3 +124,9 @@
              (set! client-write-fds (lset-difference = client-write-fds wlist))
              #f))))]))
 
+(define (client-force! client command)
+  (chatter-force! (client-chat client) command))
+
+(define (client-message! client message)
+  (chatter-message! (client-chat client) message))
+
