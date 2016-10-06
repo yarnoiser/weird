@@ -34,7 +34,12 @@
                                            sep-scheme-expr
                                            remote-command)))
 
-(event-add! (interval 1) (lambda () (chatter-message! (client-chat (fd-client (car client-read-fds))) "hello")) #t)
+(event-add! (interval 1) (lambda ()
+                           (for-each (lambda (fd)
+                                       (let ([client (fd-client fd)])
+                                         (if (not (tcp-listener? client))
+                                           (chatter-message! (client-chat client) "hello"))))
+                                     client-read-fds)) #t)
 
 (let main-loop ()
   (set! current-client (client-pop!))
