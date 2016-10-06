@@ -91,10 +91,15 @@
       [else
        (error (string-append "invalid chatter state: " (symbol->string (chatter-state (client-chat current-client)))))])))
 
-(define (client-select-next-pop?)
-  (and (null? clients-in-eval-state)
-       (null? client-selected-read-fds)
-       (null? client-selected-write-fds)))
+(define (get-readers-in-eval!)
+  (receive (eval-fds non-eval-fds) (partition (lambda (fd)
+                                                (let ([client (fd-client fd)])
+                                                  (if (tcp-listener? client)
+                                                    #f
+                                                    (eqv? (chatter-state (client-chat client)) 'eval))))
+                                              client-read-fds)
+    (set! client-read-fds non-eval-fds)
+    eval-fds))
 
 (define (client-pop!)
   ;(debug-lists)
@@ -106,11 +111,16 @@
     [(not (null? client-selected-write-fds))
      (fd-client (list-pop! client-selected-write-fds))]
     [else
-     (receive (r w) (file-select client-read-fds client-write-fds select-timeout)
-       (let ([rlist (if r r '())] [wlist (if w w '())])
-         (set! client-selected-read-fds rlist)
-         (set! client-selected-write-fds wlist)
-         (set! client-read-fds (lset-difference = client-read-fds rlist))
-         (set! client-write-fds (lset-difference = client-write-fds wlist))
-         #f))]))
+     (let ([eval-readers (get-readers-in-eval!)])
+       (if (not (null? eval-readers))
+         (begin (set! clients-in-eval-state (append clients-in-eval-state (map fd-client eval-readers)))
+                (list-pop! clients-in-eval-state))
+         
+         (receive (r w) (file-select client-read-fds client-write-fds select-timeout)
+           (let ([rlist (if r r '())] [wlist (if w w '())])
+             (set! client-selected-read-fds rlist)
+             (set! client-selected-write-fds wlist)
+             (set! client-read-fds (lset-difference = client-read-fds rlist))
+             (set! client-write-fds (lset-difference = client-write-fds wlist))
+             #f))))]))
 

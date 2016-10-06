@@ -111,7 +111,8 @@
   (file-close (writer-fd (chatter-writer chat))))
 
 (define (chatter-force! chat command)
-  (reader-tokens-set! (chatter-reader chat) (append (reader-tokens (chatter-reader chat)) (list command))))
+  (reader-tokens-set! (chatter-reader chat) (append (reader-tokens (chatter-reader chat)) (list command)))
+  (chatter-state-set! chat 'eval))
 
 (define (chatter-message! chat message)
   (chatter-force! chat (string-append "\"Message: " message "\"")))
