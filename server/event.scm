@@ -77,4 +77,14 @@
                  (event-date-zone-offset event-date)
                  (date-zone-offset date)))))
 
+(define (date->event-date)
+  (make-event-date (date-nanosecond date)
+                   (date-second date)
+                   (date-minute date)
+                   (date-hour date)
+                   (date-day date)
+                   (date-month date)
+                   (date-year date)
+                   (date-zone-offset date)))
+
 
