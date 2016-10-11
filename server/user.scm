@@ -26,7 +26,7 @@
          [fd (file-open temp-path (+ open/creat open/rdwr))]
          [writer (make-writer fd)])
     (writer-enqueue! writer (expr->string `(make-user ,(user-password user) ,(user-data user))))
-    (writer-complete-write! writer yield: #t)
+    (writer-complete-write! writer)
     (file-close fd)
     (unlink final-path)
     (file-link temp-path final-path)

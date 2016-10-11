@@ -1,8 +1,6 @@
-(declare (uses client highlevel-io remote user event debug))
+(declare (uses client highlevel-io remote user event debug init))
 (use (srfi 1) posix tcp)
 (include "shared/macros.scm")
-
-(define port-number 2000)
 
 (define (login! username password)
   (user-load! username)
@@ -12,6 +10,8 @@
            #t)
     (begin (user-unload! username)
            (error "invalid password"))))
+
+(init!)
 
 (expose! '+ 'anon)
 (expose! '- "robert")
@@ -25,7 +25,7 @@
 
 (user-clean-directory!)
 
-(define listener (tcp-listen port-number))
+(define listener (tcp-listen port))
 (client-add! listener)
 
 (client-add! (make-client #f (make-chatter fileno/stdin

@@ -10,6 +10,7 @@ SERVER_SRC=	shared/debug.scm \
 		server/remote.scm \
                 server/serialize.scm \
 		server/user.scm \
+		server/init.scm \
 
 CLIENT_SRC=	shared/debug.scm \
 		client/main.scm \

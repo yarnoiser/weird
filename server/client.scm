@@ -1,8 +1,6 @@
-(declare (unit client) (uses highlevel-io debug))
+(declare (unit client) (uses highlevel-io debug init))
 (use (srfi 1 69) tcp posix)
 (include "shared/macros.scm")
-
-(define select-timeout 1)
 
 (define client-name-table (make-hash-table))
 (define client-fd-table (make-hash-table))

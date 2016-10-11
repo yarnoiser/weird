@@ -130,7 +130,7 @@
        (begin (if yield (yield! #f))
               (loop))])))
 
-(define (writer-complete-write! writer yield)
+(define (writer-complete-write! writer)
   (let loop ()
     (cond
       [(writer-finished? writer)
