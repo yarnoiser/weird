@@ -13,6 +13,8 @@
       (echo-off! fileno/stdin)
       (let ([password (reader-read-next-token! reader)])
         (echo-on! fileno/stdin)
+        (writer-enqueue! writer "\n")
+        (writer-complete-write! writer)
         (remote-login! username password)))))
 
 (define (remote-login! username password)
