@@ -1,6 +1,7 @@
 .PHONY: clean
 
 SERVER_SRC=	shared/debug.scm \
+		shared/terminal.scm \
 		server/client.scm \
 		server/event.scm \
 		server/lowlevel-io.scm \

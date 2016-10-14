@@ -36,7 +36,7 @@
 (define (user-load! name)
   (let* ([fd (file-open (string-append user-data-path name ".scm") (+ open/rdonly))]
          [reader (make-reader fd sep-scheme-expr)])
-    (hash-table-set! users name (eval (string->expr (reader-read-next-token! reader yield: #t))))))
+    (hash-table-set! users name (eval (string->expr (reader-read-next-token! reader))))))
 
 (define (user-password-match? user password)
   (string=? (user-password (hash-table-ref users user)) (user-password-crypt password)))

@@ -163,7 +163,12 @@
           [else
            (loop (add1 i))] ))))
 
+(define (string-take-exclude-newline str sep-index)
+  (if (string=? str "")
+    ""
+    (string-take str (sub1 sep-index))))
+
 (define (sep-line str)
   (let ([sep-index (line-sep-index str)])
-    (values (string-take str sep-index) (string-drop str sep-index))))
+    (values (string-take-exclude-newline str sep-index) (string-drop str sep-index))))
 

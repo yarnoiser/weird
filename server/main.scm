@@ -1,8 +1,21 @@
-(declare (uses client highlevel-io remote user event debug init))
+(declare (uses client lowlevel-io highlevel-io remote user event debug init terminal))
 (use (srfi 1) posix tcp)
 (include "shared/macros.scm")
 
-(define (login! username password)
+(define (login!)
+  (let ([reader (make-reader fileno/stdin sep-line)]
+        [writer (make-writer fileno/stdout)])
+    (writer-enqueue! writer "Enter username: ")
+    (writer-complete-write! writer)
+    (let ([username (reader-read-next-token! reader)])
+      (writer-enqueue! writer "Enter password: ")
+      (writer-complete-write! writer)
+      (echo-off! fileno/stdin)
+      (let ([password (reader-read-next-token! reader)])
+        (echo-on! fileno/stdin)
+        (remote-login! username password)))))
+
+(define (remote-login! username password)
   (user-load! username)
   (if (user-password-match? username password)
     (begin (client-username-set! current-client username)

@@ -127,7 +127,7 @@
               (if (in-coroutine?) (yield! #f))
               (loop))]
       [else
-       (begin (if yield (yield! #f))
+       (begin (if (in-coroutine?) (yield! #f))
               (loop))])))
 
 (define (writer-complete-write! writer)
