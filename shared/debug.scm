@@ -9,3 +9,8 @@
   (display expr port)
   (newline port))
 
+(define (print-var var)
+  (display var)
+  (display ": ")
+  (display (eval var))
+  (newline))

@@ -2,12 +2,13 @@
 (use posix)
 (include "shared/macros.scm")
 
-(define config-path "server/data/config.scm")
-(define port 2000)
-(define select-timeout #f)
 (define crypt-warning
 "WARNING: This software does not have any built in encryption. It should always
 be used with a properly configured ssl/tls proxy for non testing purposes.")
+
+(define config-path "server/data/config.scm")
+(define port 2000)
+(define select-timeout #f)
 
 (define (init-args!)
   (if (regular-file? config-path)
@@ -19,10 +20,10 @@ be used with a properly configured ssl/tls proxy for non testing purposes.")
        (void)]
       [(or (string=? (car args) "-c") (string=? (car args) "--config-file"))
        (if (null? (cdr args))
-         (error "missing config file in arg string"))
+         (error "missing config file in program arguments"))
+       (set! config-path (cadr args))
        (if (not (regular-file? config-path))
          (error "no config file at specified location"))
-       (set! config-path (cadr args))
        (load config-path)]
       [(or (string=? (car args) "-p") (string=? (car args) "--port"))
        (if (null? (cdr args))
@@ -45,7 +46,6 @@ be used with a properly configured ssl/tls proxy for non testing purposes.")
     (let ([password (read-line)])
       (user-add! "admin" password))
     (print "admin account created")
-    (print "starting server...")
-  (init-args!)))
-
+    (print "starting server..."))
+  (init-args!))
 
