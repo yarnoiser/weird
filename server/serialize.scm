@@ -20,7 +20,7 @@
   (let loop ([sers serializers])
     (cond
       [(null? sers)
-       (expr->string expr)]
+       (expr->string (list 'quote expr))]
       [((serializer-pred (car sers)) expr)
        (expr->string ((serializer-proc (car sers)) expr))]
       [else

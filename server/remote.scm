@@ -99,6 +99,6 @@
                     (if (not (command-access? (client-username current-client) elem))
                       (error (string-append "could not access symbol: " (symbol->string elem))))))
                 (flatten-input expr))
-      (values (edit-output (expr->string (eval expr)))
+      (values (edit-output (serialize (eval expr)))
               "")))))
 
