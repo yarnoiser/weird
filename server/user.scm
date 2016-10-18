@@ -6,6 +6,8 @@
 
 (define password-salt "$6$uDpnXOEWj3bQofeTVXB0I.")
 
+(define file-perms (bitwise-ior perm/irusr perm/iwusr))
+
 (define users (make-hash-table))
 
 (define-record user password data)
@@ -23,7 +25,7 @@
   (let* ([temp-path (string-append user-data-path name "tmp.scm")]
          [final-path (string-append user-data-path name ".scm")]
          [user (hash-table-ref users name)]
-         [fd (file-open temp-path (+ open/creat open/rdwr))]
+         [fd (file-open temp-path (+ open/creat open/rdwr) file-perms)]
          [writer (make-writer fd)])
     (writer-enqueue! writer (expr->string `(make-user ,(user-password user) ,(user-data user))))
     (writer-complete-write! writer)

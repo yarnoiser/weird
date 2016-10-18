@@ -140,3 +140,12 @@
               (if (in-coroutine?) (yield! #f))
               (loop))])))
 
+(define (cooperative-read #!optional (fd fileno/stdin) (sep-proc sep-line))
+  (let ([reader (make-reader fd sep-proc)])
+    (reader-read-next-token! reader)))
+
+(define (cooperative-write str #!optional (fd fileno/stdout))
+  (let ([writer (make-writer fd)])
+    (writer-enqueue! writer str)
+    (writer-complete-write! writer)))
+
