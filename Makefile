@@ -13,7 +13,10 @@ SERVER_SRC=	shared/coroutine.scm \
                 server/serializer.scm \
 		server/user.scm \
 
-CLIENT_SRC=	shared/debug.scm \
+CLIENT_SRC=	shared/coroutine.scm \
+		shared/debug.scm \
+		shared/highlevel-io.scm \
+		shared/lowlevel-io.scm \
 		client/main.scm \
 
 

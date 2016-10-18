@@ -1,4 +1,4 @@
-(declare (uses client lowlevel-io highlevel-io remote user event debug init terminal))
+(declare (uses client highlevel-io remote user event debug init terminal))
 (use (srfi 1) posix tcp)
 (include "shared/macros.scm")
 
