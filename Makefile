@@ -1,17 +1,17 @@
 .PHONY: clean
 
-SERVER_SRC=	shared/debug.scm \
+SERVER_SRC=	shared/coroutine.scm \
+                shared/debug.scm \
+		shared/highlevel-io.scm \
+		shared/lowlevel-io.scm \
 		shared/terminal.scm \
 		server/client.scm \
 		server/event.scm \
-		server/lowlevel-io.scm \
-		server/highlevel-io.scm \
-		server/coroutine.scm \
+		server/init.scm \
 		server/main.scm \
 		server/remote.scm \
-                server/serialize.scm \
+                server/serializer.scm \
 		server/user.scm \
-		server/init.scm \
 
 CLIENT_SRC=	shared/debug.scm \
 		client/main.scm \
