@@ -26,3 +26,6 @@
 (define (window-update!)
   (sdl2:update-window-surface! window))
 
+(define image-load sdl2:load-bmp)
+
+
