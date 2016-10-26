@@ -11,7 +11,6 @@ SERVER_SRC=	shared/coroutine.scm \
 		server/init.scm \
 		server/main.scm \
 		server/remote.scm \
-                server/serializer.scm \
 		server/user.scm \
 
 CLIENT_SRC=	shared/coroutine.scm \
@@ -20,6 +19,7 @@ CLIENT_SRC=	shared/coroutine.scm \
 		shared/lowlevel-io.scm \
 		shared/serializer.scm \
 		client/main.scm \
+		client/window.scm \
 
 
 all: weird-client weird-server
