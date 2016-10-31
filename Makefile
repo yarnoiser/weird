@@ -1,4 +1,4 @@
-.PHONY: clean
+.PHONY: clean 
 
 SERVER_SRC=	shared/coroutine.scm \
                 shared/debug.scm \
@@ -33,8 +33,8 @@ weird-server: $(SERVER_SRC)
 clean:
 	$(RM) weird-client weird-server *.o *.c \
 	      shared/*.o shared/*.c \
-	      client/*.o client/*.c \
 	      server/*.o server/*.c \
 	      server/data/users/*.scm \
-	      server/data/*.pem \
+	      server/data/*.pem; \
+	$(RM) -r client/__pycache__
 

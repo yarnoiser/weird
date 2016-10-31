@@ -3,4 +3,4 @@ weird-server
 *.o
 *.c
 .*.swp
-
+client/__pycache__
