@@ -11,11 +11,14 @@ class Window:
     weakref.finalize(self.win, SDL_DestroyWindow, self.win)
     self.surface = SDL_GetWindowSurface(self.win)
 
-  def drawCroppedImage(image, srcRect, destRect):
+  def drawCroppedImage(self, image, srcRect, destRect):
     SDL_BlitSurface(image, srcRect, self.surface, destRect)
 
-  def drawImage(image, x, y):
+  def drawImage(self, image, x, y):
     self.drawCroppedImage(image, None, rect(x, y, image.w, image.h))
+
+  def update():
+    SDL_updateWindowSurface(self.win)
 
 def init():
   SDL_Init(SDL_INIT_VIDEO)
