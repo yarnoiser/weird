@@ -24,18 +24,24 @@ class Window:
     self.win = SDL_CreateWindow(title.encode('utf-8'), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                          width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)
     weakref.finalize(self.win, SDL_DestroyWindow, self.win)
+    self.dirtyRects = []
 
   def surface(self):
     return SDL_GetWindowSurface(self.win)
 
   def drawCroppedImage(self, image, srcRect, destRect):
     SDL_BlitSurface(image.surfacePtr, srcRect, self.surface(), destRect)
+    self.dirtyRects.append(destRect)
 
   def drawImage(self, image, x, y):
     self.drawCroppedImage(image, None, rect(x, y, image.width(), image.height()))
 
   def update(self):
-    SDL_UpdateWindowSurface(self.win)
+    length = len(self.dirtyRects)
+    RectArrayType = SDL_Rect * length
+    dirtyRectArray = RectArrayType(*self.dirtyRects)
+    SDL_UpdateWindowSurfaceRects(self.win, dirtyRectArray, length)
+    self.dirtyRects = []
 
 def init():
   SDL_Init(SDL_INIT_VIDEO)
