@@ -3,6 +3,7 @@ from sdl2.sdlimage import *
 import ctypes
 import weakref
 import atexit
+import copy
 
 class Image:
   def __init__(self, path):
@@ -13,11 +14,21 @@ class Image:
 
     weakref.finalize(self.surfacePtr, SDL_FreeSurface, self.surfacePtr)
 
+    self.xScale = 1
+    self.yScale = 1
+
   def width(self):
     return self.surfacePtr.contents.w
 
   def height(self):
     return self.surfacePtr.contents.h
+
+  def scale(self, x, y):
+    self.xScale *= x
+    self.yScale *= y
+
+  def copy(self):
+    return(copy.copy(self))
 
 class Window:
   def __init__(self, title, width, height):
@@ -30,11 +41,11 @@ class Window:
     return SDL_GetWindowSurface(self.win)
 
   def drawCroppedImage(self, image, srcRect, destRect):
-    SDL_BlitSurface(image.surfacePtr, srcRect, self.surface(), destRect)
+    SDL_BlitScaled(image.surfacePtr, srcRect, self.surface(), destRect)
     self.dirtyRects.append(destRect)
 
   def drawImage(self, image, x, y):
-    self.drawCroppedImage(image, None, rect(x, y, image.width(), image.height()))
+    self.drawCroppedImage(image, None, rect(x, y, image.width() * image.xScale, image.height() * image.yScale))
 
   def update(self):
     length = len(self.dirtyRects)
