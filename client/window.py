@@ -36,6 +36,9 @@ class Window:
                          width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)
     weakref.finalize(self.win, SDL_DestroyWindow, self.win)
     self.dirtyRects = []
+    self.width = width
+    self.height = height
+    self.scale = 1
 
   def surface(self):
     return SDL_GetWindowSurface(self.win)
@@ -47,7 +50,20 @@ class Window:
   def drawImage(self, image, x, y):
     self.drawCroppedImage(image, None, rect(x, y, image.width() * image.xScale, image.height() * image.yScale))
 
+  def resize(self):
+    newWidth = self.surface().w
+    newHeight = self.surface().h
+
+    if newWidth < newHeight:
+      self.scale = newWidth / self.width
+    else:
+      self.scale = newHeight / self.height
+
+    self.dirtyRects = [Rect(0, 0, newWidth, newHeight)]
+    self.update()
+
   def update(self):
+
     length = len(self.dirtyRects)
     RectArrayType = SDL_Rect * length
     dirtyRectArray = RectArrayType(*self.dirtyRects)
