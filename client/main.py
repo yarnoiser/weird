@@ -12,9 +12,8 @@ smallMonster = monster.copy()
 
 monster.scale(10, 10)
 
-win.drawImage(monster, 100, 100)
-win.drawImage(smallMonster, 0, 0)
-
 while 1:
+  win.drawImage(monster, 100, 100)
+  win.drawImage(smallMonster, 0, 0)
   win.resize()
 

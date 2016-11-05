@@ -48,22 +48,22 @@ class Window:
     self.dirtyRects.append(destRect)
 
   def drawImage(self, image, x, y):
-    self.drawCroppedImage(image, None, rect(x, y, image.width() * image.xScale, image.height() * image.yScale))
+    self.drawCroppedImage(image, None, rect(x, y, image.width() * image.xScale * self.scale, image.height() * image.yScale * self.scale))
 
   def resize(self):
-    newWidth = self.surface().w
-    newHeight = self.surface().h
+    SDL_PumpEvents()
+    newWidth = self.surface().contents.w
+    newHeight = self.surface().contents.h
 
     if newWidth < newHeight:
       self.scale = newWidth / self.width
     else:
       self.scale = newHeight / self.height
 
-    self.dirtyRects = [Rect(0, 0, newWidth, newHeight)]
+    self.dirtyRects = [rect(0, 0, newWidth, newHeight)]
     self.update()
 
   def update(self):
-
     length = len(self.dirtyRects)
     RectArrayType = SDL_Rect * length
     dirtyRectArray = RectArrayType(*self.dirtyRects)
@@ -86,5 +86,5 @@ def point(x, y):
   return SDL_Point(x, y)
 
 def rect(x, y, w, h):
-  return SDL_Rect(x, y, w, h)
+  return SDL_Rect(x, y, int(w), int(h))
 
