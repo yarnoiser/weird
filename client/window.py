@@ -5,6 +5,20 @@ import weakref
 import atexit
 import copy
 
+QUIT = SDL_QUIT
+
+class Event:
+  def __init__(self, event):
+    self.type = event.type
+
+def nextEvent():
+  SDL_Event event;
+  SDL_PollEvent(ctypes.byref(event)
+  if event:
+    return Event(event)
+  else:
+    return None
+
 class Image:
   def __init__(self, path):
     self.surfacePtr = IMG_Load(path.encode("utf-8"))
@@ -51,7 +65,6 @@ class Window:
     self.drawCroppedImage(image, None, rect(x, y, image.width() * image.xScale * self.scale, image.height() * image.yScale * self.scale))
 
   def resize(self):
-    SDL_PumpEvents()
     newWidth = self.surface().contents.w
     newHeight = self.surface().contents.h
 
@@ -61,7 +74,6 @@ class Window:
       self.scale = newHeight / self.height
 
     self.dirtyRects = [rect(0, 0, newWidth, newHeight)]
-    self.update()
 
   def update(self):
     length = len(self.dirtyRects)
