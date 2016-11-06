@@ -11,6 +11,24 @@ class Event:
   def __init__(self, event):
     self.type = event.type
 
+class EventHandler:
+  def __init__(self, eventType, procedure):
+    self.eventType = eventType
+    self.procedure = procedure
+
+  def run(self, event):
+    if event.type == self.eventType:
+      self.procedure(event) 
+
+eventHandlers = []
+
+def addHandler(eventType, procedure):
+  eventHandlers.append(EventHandler(eventType, procedure))
+
+def handleEvent(event):
+  for handler in eventHanders:
+    handler.run(event)
+
 def nextEvent():
   SDL_Event event;
   SDL_PollEvent(ctypes.byref(event)
