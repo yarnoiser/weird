@@ -6,6 +6,7 @@ import atexit
 import copy
 
 QUIT = SDL_QUIT
+RESIZE = SDL_WINDOWEVENT_SIZE_CHANGED
 
 eventHandlers = {}
 
@@ -13,7 +14,10 @@ closed = False
 
 class Event:
   def __init__(self, event):
-    self.type = event.type
+    if event.type == SDL_WINDOWEVENT:
+      self.type = event.window.type
+    else:
+      self.type = event.type
 
 def addHandler(eventType, procedure):
   if eventType in eventHandlers:
