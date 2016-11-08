@@ -7,11 +7,13 @@ import copy
 
 QUIT = SDL_QUIT
 
+eventHandlers = {}
+
+closed = False
+
 class Event:
   def __init__(self, event):
     self.type = event.type
-
-eventHandlers = {}
 
 def addHandler(eventType, procedure):
   if eventType in eventHandlers:
@@ -19,13 +21,20 @@ def addHandler(eventType, procedure):
   else:
     eventHandlers[eventType] = [procedure]
 
+def quitHandler(event):
+  closed = True
+
+addHandler(QUIT, quit)
+
 def handleEvent(event):
-  for handler in eventHandlers[event.type]:
-    handler(event)
+  if event.type in eventHandlers:
+    for handler in eventHandlers[event.type]:
+      handler(event)
 
 def nextEvent():
-  SDL_Event event;
-  SDL_PollEvent(ctypes.byref(event)
+  event = SDL_Event()
+  SDL_PollEvent(ctypes.byref(event))
+
   if event:
     return Event(event)
   else:
