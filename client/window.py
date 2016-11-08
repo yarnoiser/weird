@@ -11,23 +11,17 @@ class Event:
   def __init__(self, event):
     self.type = event.type
 
-class EventHandler:
-  def __init__(self, eventType, procedure):
-    self.eventType = eventType
-    self.procedure = procedure
-
-  def run(self, event):
-    if event.type == self.eventType:
-      self.procedure(event) 
-
-eventHandlers = []
+eventHandlers = {}
 
 def addHandler(eventType, procedure):
-  eventHandlers.append(EventHandler(eventType, procedure))
+  if eventType in eventHandlers:
+    eventHandlers[eventType].append(procedure)
+  else:
+    eventHandlers[eventType] = [procedure]
 
 def handleEvent(event):
-  for handler in eventHanders:
-    handler.run(event)
+  for handler in eventHandlers[event.type]:
+    handler(event)
 
 def nextEvent():
   SDL_Event event;
@@ -36,6 +30,12 @@ def nextEvent():
     return Event(event)
   else:
     return None
+
+def handleNextEvent():
+  event = nextEvent()
+
+  if event:
+    handleEvent(event)
 
 class Image:
   def __init__(self, path):
