@@ -53,4 +53,9 @@
   (let ([location (get-room location-name)])
     (teleport object location)))
 
+(define-generic (move object exit))
+
+(define-method (move (object <world-object>) (exit <exit>))
+  (let ([new-location (slot-value exit 'room)])
+    (teleport object new-location)))
 
