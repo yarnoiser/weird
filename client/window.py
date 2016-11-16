@@ -6,7 +6,7 @@ import atexit
 import copy
 
 QUIT = SDL_QUIT
-RESIZE = SDL_WINDOWEVENT_SIZE_CHANGED
+RESIZE = SDL_WINDOWEVENT_RESIZED
 
 eventHandlers = {}
 
@@ -16,6 +16,10 @@ class Event:
   def __init__(self, event):
     if event.type == SDL_WINDOWEVENT:
       self.type = event.window.type
+      self.window = event.window.windowID
+      if event.window.type == SDL_WINDOWEVENT_RESIZED:
+        self.width = event.window.data1
+        self.height = event.window.data2
     else:
       self.type = event.type
 
@@ -95,14 +99,11 @@ class Window:
   def drawImage(self, image, x, y):
     self.drawCroppedImage(image, None, rect(x, y, image.width() * image.xScale * self.scale, image.height() * image.yScale * self.scale))
 
-  def resize(self):
-    newWidth = self.surface().contents.w
-    newHeight = self.surface().contents.h
-
-    if newWidth < newHeight:
-      self.scale = newWidth / self.width
+  def resize(self, width, height):
+    if width < height:
+      self.scale = width / self.width
     else:
-      self.scale = newHeight / self.height
+      self.scale = height / self.height
 
     self.dirtyRects = [rect(0, 0, newWidth, newHeight)]
 
