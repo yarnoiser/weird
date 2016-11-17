@@ -20,11 +20,30 @@
    [description initform: ""]
    [room initform: #f]))
 
-(define (make-room rname rdescription robjects rexits)
+(define (make-exit ename edescription eroom)
+  (make <exit> 'name ename 'description edescription 'room eroom))
+
+(define exit make-exit)
+
+(define (make-room rname rdescription rexits #!optional robjects)
   (make <room> 'name rname
                'description rdescription
                'objects robjects
                'exits rexits))
+
+(define (room rname rdescription rexits #!optional robjects)
+  (let ([r (make-room rname rdescription (make-hash-table) robjects)])
+    (for-each (lambda (exit-args)
+                (hash-table-set! (slot-value r 'exits) (car exit-args) (apply make-exit exit-args)))
+              rexits)
+    r))
+
+(define (world . rooms)
+  (let ([world-table (make-hash-table)])
+    (for-each (lambda (room-args)
+                (hash-table-set! world-table (car room) (apply room room-args)))
+              rooms))
+  world-table)
 
 (define (make-world-object oname odescription olocation)
   (make <world-object> 'name oname
@@ -35,9 +54,6 @@
   (if (hash-table-exists? rooms name)
     (hash-table-ref rooms name)
     #f))
-
-(define (make-exit ename edescription eroom)
-  (make <exit> 'name ename 'description edescription 'room eroom))
 
 (define-generic (teleport object location))
 
