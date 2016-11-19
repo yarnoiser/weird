@@ -40,7 +40,7 @@
 
 (define-syntax world (syntax-rules ()
   [(_ (room-name room-description (room-exit ...)))
-   (make-room room-name room-description `(,room-exit ...))] ))
+   (make-room room-name room-description `(,(apply make-exit room-exit) ...))] ))
 
 (define (make-world-object oname odescription olocation)
   (make <world-object> 'name oname
