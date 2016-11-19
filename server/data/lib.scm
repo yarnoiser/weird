@@ -31,19 +31,16 @@
                'objects robjects
                'exits rexits))
 
-(define (room rname rdescription rexits #!optional robjects)
-  (let ([r (make-room rname rdescription (make-hash-table) robjects)])
-    (for-each (lambda (exit-args)
-                (hash-table-set! (slot-value r 'exits) (car exit-args) (apply make-exit exit-args)))
-              rexits)
-    r))
-
-(define (world . rooms)
+(define (make-world . rooms)
   (let ([world-table (make-hash-table)])
     (for-each (lambda (room-args)
-                (hash-table-set! world-table (car room) (apply room room-args)))
+                (hash-table-set! world-table (car room) (apply make-room room-args)))
               rooms))
   world-table)
+
+(define-syntax world (syntax-rules ()
+  [(_ (room-name room-description (room-exit ...)))
+   (make-room room-name room-description `(,room-exit ...))] ))
 
 (define (make-world-object oname odescription olocation)
   (make <world-object> 'name oname
