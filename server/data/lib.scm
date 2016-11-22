@@ -23,8 +23,6 @@
 (define (make-exit ename edescription eroom)
   (make <exit> 'name ename 'description edescription 'room eroom))
 
-(define exit make-exit)
-
 (define (make-room rname rdescription rexits #!optional robjects)
   (make <room> 'name rname
                'description rdescription
@@ -66,9 +64,9 @@
   (let ([location (get-room location-name)])
     (teleport object location)))
 
-(define-generic (move object exit))
+(define-generic (move object room-exit))
 
-(define-method (move (object <world-object>) (exit <exit>))
+(define-method (move (object <world-object>) (room-exit <exit>))
   (let ([new-location (slot-value exit 'room)])
     (teleport object new-location)))
 
