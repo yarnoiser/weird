@@ -4,6 +4,12 @@
 
 (define objects (make-hash-table))
 
+(deifne-class <world> ()
+  ([regions initform: (make-hash-table)]))
+
+(define-class <region> ()
+  ([rooms initform: (make-hash-table)]))
+
 (define-class <world-object> ()
    ([name initform: ""]
     [description initform: ""]
@@ -15,44 +21,46 @@
    [objects initform: (make-hash-table)]
    [exits initform: (make-hash-table)]))
 
-(define-class <exit> ()
+(define-class <room-exit> ()
   ([name initform: ""]
    [description initform: ""]
    [room initform: #f]))
 
-(define (make-exit ename edescription eroom)
-  (make <exit> 'name ename 'description edescription 'room eroom))
+(define-class <region-exit> (room-exit)
+   [region initform: #f])
 
-(define (make-room rname rdescription rexits #!optional robjects)
-  (make <room> 'name rname
-               'description rdescription
-               'objects robjects
-               'exits rexits))
+(define-generic (region-add-room region room))
 
-(define (make-world . rooms)
-  (let ([world-table (make-hash-table)])
-    (for-each (lambda (room-args)
-                (hash-table-set! world-table (car room) (apply make-room room-args)))
-              rooms))
-  world-table)
+(define-method (region-add-room (region <region>) (room <room>))
+  (hash-table-set! (slot-value region 'rooms) (slot-value room 'name) room))
 
-(define-syntax world (syntax-rules ()
-  [(_ (room-name room-description (room-exit ...)))
-   (make-room room-name room-description `(,(apply make-exit room-exit) ...))] ))
+(define (make-region #!optional (rooms '()))
+  (let ([region (make <region>)])
+    (for-each (lambda (room)
+                (region-add-room region room))
+              region)))
 
-(define (make-world-object oname odescription olocation)
-  (make <world-object> 'name oname
-                       'description odescription
-                       'location olocation))
+(define-generic (world-add-region world region))
 
-(define (get-room name)
-  (if (hash-table-exists? rooms name)
-    (hash-table-ref rooms name)
-    #f))
+(define-method (world-add-region! (world <world>) (region <region>))
+  (hash-table-set! (slot-value world 'regions) (slot-value region 'name) region))
 
-(define-generic (teleport object location))
+(define (make-world #!optional (regions '()))
+  (let ([world (make-world)])
+    (for-each (lambda (region)
+                (world-add-region! world region))
+              regions)
+    world))
 
-(define-method (teleport (object <world-object>) (location <room>))
+
+(define-generic room-add-exit room room-exit)
+
+(define-method room-add-exit (room <room>) (room-exit <room-exit>)
+  (hash-table-set! (slot-value room 'exits) (slot-value room-exit 'name))
+
+(define-generic (teleport! object location))
+
+(define-method (teleport! (object <world-object>) (location <room>))
   (let ([current-location (slot-value object 'location)])
     (when current-location
       (hash-table-delete! (slot-value current-location 'objects) object))
@@ -60,13 +68,31 @@
     (set! (slot-value object 'location) location)
     #t))
 
-(define-method (teleport (object <world-object>) (location-name <string>))
+(define-method (teleport! (object <world-object>) (location-name <string>))
   (let ([location (get-room location-name)])
     (teleport object location)))
 
-(define-generic (move object room-exit))
+(define room-add-object! teleport!)
 
-(define-method (move (object <world-object>) (room-exit <exit>))
+(define-generic (move! object room-exit))
+
+(define-method (move! (object <world-object>) (room-exit <exit>))
   (let ([new-location (slot-value exit 'room)])
     (teleport object new-location)))
+
+(define (make-room rname rdescription #!optional (rexits '()) (robjects '()))
+  (let ([room (make <room> 'name rname
+                           'description rdescription)])
+    (for-each (lambda (rexit)
+                (room-add-exit! room rexit))
+                rexits)
+    (for-each (lambda (robjects)
+                (room-add-object! room objects))
+                robjects)
+    room))
+  
+(define (make-world-object oname odescription olocation)
+  (make <world-object> 'name oname
+                       'description odescription
+                       'location olocation))
 
