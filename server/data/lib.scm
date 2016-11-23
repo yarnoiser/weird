@@ -4,7 +4,7 @@
 
 (define objects (make-hash-table))
 
-(deifne-class <world> ()
+(define-class <world> ()
   ([regions initform: (make-hash-table)]))
 
 (define-class <region> ()
@@ -24,10 +24,10 @@
 (define-class <room-exit> ()
   ([name initform: ""]
    [description initform: ""]
-   [room initform: #f]))
+   [destination initform: #f]))
 
-(define-class <region-exit> (room-exit)
-   [region initform: #f])
+(define-class <region-exit> (<room-exit>)
+   ([region initform: #f]))
 
 (define-generic (region-add-room region room))
 
@@ -40,7 +40,7 @@
                 (region-add-room region room))
               region)))
 
-(define-generic (world-add-region world region))
+(define-generic (world-add-region! world region))
 
 (define-method (world-add-region! (world <world>) (region <region>))
   (hash-table-set! (slot-value world 'regions) (slot-value region 'name) region))
@@ -52,11 +52,10 @@
               regions)
     world))
 
+(define-generic (room-add-exit! room room-exit))
 
-(define-generic room-add-exit room room-exit)
-
-(define-method room-add-exit (room <room>) (room-exit <room-exit>)
-  (hash-table-set! (slot-value room 'exits) (slot-value room-exit 'name))
+(define-method (room-add-exit! (room <room>) (room-exit <room-exit>))
+  (hash-table-set! (slot-value room 'exits) (slot-value room-exit 'name)))
 
 (define-generic (teleport! object location))
 
@@ -76,7 +75,7 @@
 
 (define-generic (move! object room-exit))
 
-(define-method (move! (object <world-object>) (room-exit <exit>))
+(define-method (move! (object <world-object>) (room-exit <room-exit>))
   (let ([new-location (slot-value exit 'room)])
     (teleport object new-location)))
 
@@ -95,4 +94,18 @@
   (make <world-object> 'name oname
                        'description odescription
                        'location olocation))
+
+(define-syntax area-exit (syntax-rules (to region)
+  [(_ n to region reg room desc)
+   (make <region-exit> 'name n
+                       'region reg
+                       'destination room
+                       'description desc)]
+  [(_ n to room desc)
+   (make <room-exit> 'name n
+                     'destination room
+                     'description desc)]))
+
+
+   
 
