@@ -95,17 +95,18 @@
                        'description odescription
                        'location olocation))
 
-(define-syntax area-exit (syntax-rules (to region)
-  [(_ n to region reg room desc)
+(define-syntax exits (syntax-rules (to region)
+  [(_ (n to region reg room desc))
    (make <region-exit> 'name n
                        'region reg
                        'destination room
                        'description desc)]
-  [(_ n to room desc)
+  [(_ (n to room desc))
    (make <room-exit> 'name n
                      'destination room
-                     'description desc)]))
-
-
-   
+                     'description desc)]
+  [(_ (make . rest))
+   (make . rest)]
+  [(_ form form* ...)
+   (list (exits form) (exits form*) ...)]))
 
