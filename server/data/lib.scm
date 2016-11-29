@@ -1,4 +1,4 @@
-(use coops coops-primitive-objects (srfi 69))
+(use coops coops-primitive-objects (srfi 1 69))
 
 (define rooms (make-hash-table))
 
@@ -109,4 +109,11 @@
    (make . rest)]
   [(_ form form* ...)
    (list (exits form) (exits form*) ...)]))
+
+(define-syntax rooms (syntax-rules ()
+  [(_ (rname rdescription rexits) ...)
+   (list (make-room rname rdescription rexits) ...)]
+  [(_ (rname rdescription rexits robjects) ...)
+   (list (make-room rname rdescription rexits robjects) ...)]))
+
 
