@@ -8,7 +8,9 @@
   ([regions initform: (make-hash-table)]))
 
 (define-class <region> ()
-  ([rooms initform: (make-hash-table)]))
+  ([name initform: ""]
+   [description initform: ""]
+   [rooms initform: (make-hash-table)]))
 
 (define-class <world-object> ()
    ([name initform: ""]
@@ -95,13 +97,13 @@
                        'description odescription
                        'location olocation))
 
-(define-syntax exits (syntax-rules (to region)
-  [(_ (n to region reg room desc))
+(define-syntax exits (syntax-rules (exit: to region)
+  [(_ (exit: n to region reg room desc))
    (make <region-exit> 'name n
                        'region reg
                        'destination room
                        'description desc)]
-  [(_ (n to room desc))
+  [(_ (exit: n to room desc))
    (make <room-exit> 'name n
                      'destination room
                      'description desc)]
@@ -110,10 +112,15 @@
   [(_ form form* ...)
    (list (exits form) (exits form*) ...)]))
 
-(define-syntax rooms (syntax-rules ()
-  [(_ (rname rdescription rexits) ...)
+(define-syntax rooms (syntax-rules (room:)
+  [(_ (room: rname rdescription rexits) ...)
    (list (make-room rname rdescription rexits) ...)]
-  [(_ (rname rdescription rexits robjects) ...)
+  [(_ (room: rname rdescription rexits robjects) ...)
    (list (make-room rname rdescription rexits robjects) ...)]))
 
+(define-syntax regions (syntax-rules (region:)
+  [(_ (region: rname rdescription rrooms) ...)
+   (_ (make <region> 'name rname
+                     'description rdescription
+                     'rooms rrooms) ...)]))
 
