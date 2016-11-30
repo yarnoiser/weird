@@ -5,7 +5,9 @@
 (define objects (make-hash-table))
 
 (define-class <world> ()
-  ([regions initform: (make-hash-table)]))
+  ([name initform: ""]
+   [description initform: ""]
+   [regions initform: (make-hash-table)]))
 
 (define-class <region> ()
   ([name initform: ""]
@@ -31,9 +33,12 @@
 (define-class <region-exit> (<room-exit>)
    ([region initform: #f]))
 
-(define-generic (region-add-room region room))
+(define-class <world-exit> (<region-exit>)
+  ([world initform: #f]))
 
-(define-method (region-add-room (region <region>) (room <room>))
+(define-generic (region-add-room! region room))
+
+(define-method (region-add-room! (region <region>) (room <room>))
   (hash-table-set! (slot-value region 'rooms) (slot-value room 'name) room))
 
 (define (make-region #!optional (rooms '()))
@@ -71,7 +76,7 @@
 
 (define-method (teleport! (object <world-object>) (location-name <string>))
   (let ([location (get-room location-name)])
-    (teleport object location)))
+    (teleport! object location)))
 
 (define room-add-object! teleport!)
 
@@ -81,46 +86,55 @@
   (let ([new-location (slot-value exit 'room)])
     (teleport object new-location)))
 
-(define (make-room rname rdescription #!optional (rexits '()) (robjects '()))
-  (let ([room (make <room> 'name rname
-                           'description rdescription)])
-    (for-each (lambda (rexit)
-                (room-add-exit! room rexit))
-                rexits)
-    (for-each (lambda (robjects)
-                (room-add-object! room objects))
-                robjects)
-    room))
-  
 (define (make-world-object oname odescription olocation)
   (make <world-object> 'name oname
                        'description odescription
                        'location olocation))
 
-(define-syntax exits (syntax-rules (exit: to region)
-  [(_ (exit: n to region reg room desc))
-   (make <region-exit> 'name n
-                       'region reg
-                       'destination room
-                       'description desc)]
-  [(_ (exit: n to room desc))
-   (make <room-exit> 'name n
-                     'destination room
-                     'description desc)]
-  [(_ (make . rest))
-   (make . rest)]
-  [(_ form form* ...)
-   (list (exits form) (exits form*) ...)]))
+(define (room-exit name description destination)
+  (make <room-exit> 'name name
+                    'description description
+                    'destination destination))
 
-(define-syntax rooms (syntax-rules (room:)
-  [(_ (room: rname rdescription rexits) ...)
-   (list (make-room rname rdescription rexits) ...)]
-  [(_ (room: rname rdescription rexits robjects) ...)
-   (list (make-room rname rdescription rexits robjects) ...)]))
+(define (region-exit name description region destination)
+  (make <region-exit> 'name name
+                      'description description
+                      'region region
+                      'destination destination)) 
 
-(define-syntax regions (syntax-rules (region:)
-  [(_ (region: rname rdescription rrooms) ...)
-   (_ (make <region> 'name rname
-                     'description rdescription
-                     'rooms rrooms) ...)]))
+(define (world-exit name description world region destination)
+  (make <world-exit> 'name name
+                     'description description
+                     'world world
+                     'region region
+                     'destination destination))
+                     
 
+(define (room name description . exits-and-objects)
+  (let ([r (make <room> 'name name
+                        'description description)])
+    (for-each (lambda (exit-or-object)
+                (cond
+                  [(subclass? (class-of exit-or-object) <room-exit>)
+                   (room-add-exit! r exit-or-object)]
+                  [(subclass? (class-of exit-or-object) <world-object>)
+                   (room-add-object! r exit-or-object)]))
+              exits-and-objects)
+    r))
+
+(define (region name description . rooms)
+  (let ([r (make <region> 'name name
+                          'description description)])
+    (for-each (lambda (room)
+                (region-add-room! r room))
+              rooms)
+   r))
+
+(define (world name description . regions)
+  (let ([w (make <world> 'name name
+                         'description description)])
+    (for-each (lambda (region)
+                (world-add-region! w region))
+              regions)
+    w))
+                         
