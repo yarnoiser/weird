@@ -1,9 +1,5 @@
 (use coops coops-primitive-objects (srfi 1 69))
 
-(define rooms (make-hash-table))
-
-(define objects (make-hash-table))
-
 (define-class <world> ()
   ([name initform: ""]
    [description initform: ""]
@@ -36,16 +32,17 @@
 (define-class <world-exit> (<region-exit>)
   ([world initform: #f]))
 
+(define worlds (make-hash-table))
+
+(define-generic (add-world! world))
+
+(define-method (add-world! (world <world>))
+  (hash-table-set! worlds (slot-value world 'name) world))
+
 (define-generic (region-add-room! region room))
 
 (define-method (region-add-room! (region <region>) (room <room>))
   (hash-table-set! (slot-value region 'rooms) (slot-value room 'name) room))
-
-(define (make-region #!optional (rooms '()))
-  (let ([region (make <region>)])
-    (for-each (lambda (room)
-                (region-add-room region room))
-              region)))
 
 (define-generic (world-add-region! world region))
 
@@ -136,5 +133,4 @@
     (for-each (lambda (region)
                 (world-add-region! w region))
               regions)
-    w))
-                         
+    w))                         
